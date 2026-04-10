@@ -22,7 +22,7 @@ namespace CRUDMahasiswaADO
             conn = new SqlConnection(connectionString);
         }
 
-        // Test Koneksi
+        // Test Koneksi data
         private void BtnConnect_Click(object sender, EventArgs e)
         {
             try
@@ -156,7 +156,7 @@ namespace CRUDMahasiswaADO
             }
         }
 
-        // Update Data
+        // Update Data 
         private void BtnUpdate_Click(object sender, EventArgs e)
         {
             try
