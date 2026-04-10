@@ -11,39 +11,41 @@ using System.Windows.Forms;
 
 namespace CRUDMahasiswaADO
 {
-    public partial class Form1 : Form
+    public partial class FormMahasiswa : Form
     {
-        private SqlConnection conn;
+        private readonly SqlConnection conn;
         private readonly string connectionString = "Data Source=LAPTOP-6B5BO8RM\\SA;Initial Catalog=DBAkademikADO;Integrated Security=True";
 
-        public Form1()
+        public FormMahasiswa()
         {
             InitializeComponent();
             conn = new SqlConnection(connectionString);
         }
 
-        private void ConnectDatabase()
+        // Test Koneksi
+        private void BtnConnect_Click(object sender, EventArgs e)
         {
             try
             {
                 if (conn.State == ConnectionState.Closed)
                 {
                     conn.Open();
+                    MessageBox.Show("Koneksi berhasil!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    conn.Close();
                 }
-                MessageBox.Show("Koneksi berhasil!");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Koneksi gagal: " + ex.Message);
+                MessageBox.Show("Koneksi gagal: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // load data
-        private void btnLoad_Click(object sender, EventArgs e)
+        // Load Data
+        private void BtnLoad_Click(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                if (conn.State == ConnectionState.Closed)
                 {
                     conn.Open();
                 }
@@ -75,49 +77,50 @@ namespace CRUDMahasiswaADO
                 }
 
                 reader.Close();
+                MessageBox.Show($"Data berhasil dimuat! ({dataGridView1.Rows.Count} record)", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Gagal menampilkan data: " + ex.Message);
+                MessageBox.Show("Gagal menampilkan data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        //insert
-        private void btnInsert_Click(object sender, EventArgs e)
+        // Insert Data
+        private void BtnInsert_Click(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                if (string.IsNullOrWhiteSpace(txtNIM.Text))
                 {
-                    conn.Open();
-                }
-
-                if (txtNIM.Text == "")
-                {
-                    MessageBox.Show("NIM harus diisi");
+                    MessageBox.Show("NIM harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtNIM.Focus();
                     return;
                 }
 
-                if (txtNama.Text == "")
+                if (string.IsNullOrWhiteSpace(txtNama.Text))
                 {
-                    MessageBox.Show("Nama harus diisi");
+                    MessageBox.Show("Nama harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtNama.Focus();
                     return;
                 }
 
-                if (cmbJK.Text == "")
+                if (cmbJK.SelectedItem == null)
                 {
-                    MessageBox.Show("Jenis Kelamin harus dipilih");
+                    MessageBox.Show("Jenis Kelamin harus dipilih", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     cmbJK.Focus();
                     return;
                 }
 
-                if (txtKodeProdi.Text == "")
+                if (string.IsNullOrWhiteSpace(txtKodeProdi.Text))
                 {
-                    MessageBox.Show("Kode Prodi harus diisi");
+                    MessageBox.Show("Kode Prodi harus diisi", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     txtKodeProdi.Focus();
                     return;
+                }
+
+                if (conn.State == ConnectionState.Closed)
+                {
+                    conn.Open();
                 }
 
                 string query = @"INSERT INTO Mahasiswa
@@ -138,27 +141,33 @@ namespace CRUDMahasiswaADO
 
                 if (result > 0)
                 {
-                    MessageBox.Show("Data berhasil ditambahkan");
+                    MessageBox.Show("Data berhasil ditambahkan!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ClearForm();
-                    btnLoad.PerformClick();
+                    BtnLoad_Click(sender, e);
                 }
                 else
                 {
-                    MessageBox.Show("Data gagal ditambahkan");
+                    MessageBox.Show("Data gagal ditambahkan!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        //update
-        private void btnUpdate_Click(object sender, EventArgs e)
+        // Update Data
+        private void BtnUpdate_Click(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                if (string.IsNullOrWhiteSpace(txtNIM.Text))
+                {
+                    MessageBox.Show("Pilih data yang akan diupdate", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                if (conn.State == ConnectionState.Closed)
                 {
                     conn.Open();
                 }
@@ -184,40 +193,46 @@ namespace CRUDMahasiswaADO
 
                 if (result > 0)
                 {
-                    MessageBox.Show("Data berhasil diupdate");
+                    MessageBox.Show("Data berhasil diupdate!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     ClearForm();
-                    btnLoad.PerformClick();
+                    BtnLoad_Click(sender, e);
                 }
                 else
                 {
-                    MessageBox.Show("Data tidak ditemukan");
+                    MessageBox.Show("Data dengan NIM " + txtNIM.Text + " tidak ditemukan!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // delete
-        private void btnDelete_Click(object sender, EventArgs e)
+        // Delete Data
+        private void BtnDelete_Click(object sender, EventArgs e)
         {
             try
             {
-                if (conn.State == System.Data.ConnectionState.Closed)
+                if (string.IsNullOrWhiteSpace(txtNIM.Text))
                 {
-                    conn.Open();
+                    MessageBox.Show("Pilih data yang akan dihapus", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
                 }
 
                 DialogResult resultConfirm = MessageBox.Show(
-                    "Yakin ingin menghapus data?",
-                    "Konfirmasi",
+                    $"Yakin ingin menghapus data dengan NIM {txtNIM.Text}?",
+                    "Konfirmasi Hapus",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question
                 );
 
                 if (resultConfirm == DialogResult.Yes)
                 {
+                    if (conn.State == ConnectionState.Closed)
+                    {
+                        conn.Open();
+                    }
+
                     string query = "DELETE FROM Mahasiswa WHERE NIM = @NIM";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
@@ -227,23 +242,23 @@ namespace CRUDMahasiswaADO
 
                     if (result > 0)
                     {
-                        MessageBox.Show("Data berhasil dihapus");
+                        MessageBox.Show("Data berhasil dihapus!", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         ClearForm();
-                        btnLoad.PerformClick();
+                        BtnLoad_Click(sender, e);
                     }
                     else
                     {
-                        MessageBox.Show("Data tidak ditemukan");
+                        MessageBox.Show("Data tidak ditemukan!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Terjadi kesalahan: " + ex.Message);
+                MessageBox.Show("Terjadi kesalahan: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        //clear form
+        // Clear Form
         private void ClearForm()
         {
             txtNIM.Clear();
@@ -255,50 +270,24 @@ namespace CRUDMahasiswaADO
             txtNIM.Focus();
         }
 
-        // form load
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            cmbJK.Items.Clear();
-            cmbJK.Items.Add("L");
-            cmbJK.Items.Add("P");
-
-            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dataGridView1.MultiSelect = false;
-            dataGridView1.ReadOnly = true;
-            dataGridView1.AllowUserToAddRows = false;
-            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            dataGridView1.CellClick += dataGridView1_CellClick;
-        }
-
-        // Cell click event untuk mengisi form saat baris di klik
-        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        // Cell Click - mengisi form saat baris diklik
+        private void DataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
-                txtNIM.Text = row.Cells["NIM"].Value.ToString();
-                txtNama.Text = row.Cells["Nama"].Value.ToString();
-                cmbJK.Text = row.Cells["JenisKelamin"].Value.ToString();
-                dtpTanggalLahir.Value = Convert.ToDateTime(row.Cells["TanggalLahir"].Value);
-                txtAlamat.Text = row.Cells["Alamat"].Value.ToString();
-                txtKodeProdi.Text = row.Cells["KodeProdi"].Value.ToString();
+
+                txtNIM.Text = row.Cells["NIM"].Value?.ToString() ?? "";
+                txtNama.Text = row.Cells["Nama"].Value?.ToString() ?? "";
+                cmbJK.SelectedItem = row.Cells["JenisKelamin"].Value?.ToString();
+
+                if (row.Cells["TanggalLahir"].Value != null)
+                {
+                    dtpTanggalLahir.Value = Convert.ToDateTime(row.Cells["TanggalLahir"].Value);
+                }
+
+                txtAlamat.Text = row.Cells["Alamat"].Value?.ToString() ?? "";
+                txtKodeProdi.Text = row.Cells["KodeProdi"].Value?.ToString() ?? "";
             }
         }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void NIM_Click(object sender, EventArgs e)
-        {
-
-        }
-    }
-}
+        
