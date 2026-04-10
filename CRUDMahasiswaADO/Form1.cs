@@ -290,4 +290,24 @@ namespace CRUDMahasiswaADO
                 txtKodeProdi.Text = row.Cells["KodeProdi"].Value?.ToString() ?? "";
             }
         }
-        
+        // Form Load
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            // Set ComboBox untuk Jenis Kelamin
+            cmbJK.Items.Clear();
+            cmbJK.Items.Add("L");
+            cmbJK.Items.Add("P");
+            cmbJK.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            // Set DataGridView
+            dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dataGridView1.MultiSelect = false;
+            dataGridView1.ReadOnly = true;
+            dataGridView1.AllowUserToAddRows = false;
+            dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            // Event CellClick
+            dataGridView1.CellClick += DataGridView1_CellClick;
+        }
+    }
+}
